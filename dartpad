@@ -1,0 +1,79 @@
+void main() {
+  double gajiBulanan = 55000000.0;
+  const double ptkp = 54000000.0;
+  double gajiTahunan = gajiBulanan * 12;
+  double pkp = gajiTahunan - ptkp;
+
+  // Definisi lapisan pajak progresif
+  List<List<double>> lapisanPajak = [
+    [60000000.0, 0.05], // sampai 60jt -> 5%
+    [250000000.0, 0.15], // sampai 250jt -> 15%
+    [500000000.0, 0.25], // sampai 500jt -> 25%
+    [double.infinity, 0.30], // sisanya -> 30%
+  ];
+
+  print("Gaji Bulanan : Rp${gajiBulanan.toStringAsFixed(2)}");
+  print("Gaji Tahunan : Rp${gajiTahunan.toStringAsFixed(2)}");
+  print("PTKP         : Rp${ptkp.toStringAsFixed(2)}");
+  print("PKP          : Rp${pkp.toStringAsFixed(2)}\n");
+
+  if (pkp <= 0) {
+    print("PKP <= 0, jadi Pajak = Rp0.00");
+    return;
+  }
+
+  double totalPajakTahunan = 0.0;
+  double pkpSisa = pkp;
+  double batasBawahLapisan = 0.0;
+
+  print("=== Perhitungan Pajak (Metode Lapisan Progresif) ===");
+
+  // Variabel untuk menampung rincian pajak per lapisan
+  double pajak5persen = 0.0;
+  double pajak15persen = 0.0;
+  double pajak25persen = 0.0;
+  double pajak30persen = 0.0;
+  int indexLapisan = 0;
+
+  for (var lapisan in lapisanPajak) {
+    double batasAtasLapisan = lapisan[0];
+    double tarif = lapisan[1];
+    double jarakLapisan = batasAtasLapisan - batasBawahLapisan;
+
+    double basisPajak = 0.0;
+
+    if (pkpSisa > 0.0) {
+      basisPajak = (pkpSisa > jarakLapisan ? jarakLapisan : pkpSisa);
+    }
+
+    if (basisPajak > 0.0) {
+      double pajakLapisan = tarif * basisPajak;
+      totalPajakTahunan += pajakLapisan;
+      pkpSisa -= basisPajak;
+
+      // Simpan hasil ke variabel lapisan yang sesuai
+      if (indexLapisan == 0)
+        pajak5persen = pajakLapisan;
+      else if (indexLapisan == 1)
+        pajak15persen = pajakLapisan;
+      else if (indexLapisan == 2)
+        pajak25persen = pajakLapisan;
+      else if (indexLapisan == 3)
+        pajak30persen = pajakLapisan;
+
+      indexLapisan++;
+    }
+
+    batasBawahLapisan = batasAtasLapisan;
+    if (pkpSisa <= 0.0) break;
+  }
+
+  // === Output Hasil Pajak ===
+  print("Pajak 5% dari 60jt       : Rp${pajak5persen.toStringAsFixed(2)}");
+  print("Pajak 15% dari 190jt     : Rp${pajak15persen.toStringAsFixed(2)}");
+  print("Pajak 25% dari 250jt     : Rp${pajak25persen.toStringAsFixed(2)}");
+  print("Pajak 30% sisanya        : Rp${pajak30persen.toStringAsFixed(2)}");
+
+  print("-----------------------------------");
+  print("Total Pajak Tahunan      : Rp${totalPajakTahunan.toStringAsFixed(2)}");
+}
